@@ -17,8 +17,10 @@ class SmilesDataset(Dataset):
                  data_path: str,
                  tokenizer,
                  use_scaffold=False,
-                 max_len: int=0) -> None:
+                 max_len: int=0,
+                 quickmode=True) -> None:
 
+        self.quickmode = quickmode
         self.max_len = max_len
         self.data_path = data_path 
         self.use_scaffold = use_scaffold
@@ -36,9 +38,16 @@ class SmilesDataset(Dataset):
         
     def load_molecules(self,) -> List[str]:
         molecules = []
-        with open(self.data_path, 'r') as f:
-            molecules = f.readlines()
-            molecules = [smiles.strip() for smiles in molecules]
+        if self.quickmode:
+            MAX_MOL = 1000000
+            with open(self.data_path, 'r') as f:
+                for i in tqdm(range(MAX_MOL)):
+                    line = f.readline().strip()
+                    molecules.append(line)
+        else:
+            with open(self.data_path, 'r') as f:
+                molecules = f.readlines()
+                molecules = [smiles.strip() for smiles in molecules]
         return molecules
 
     def __len__(self) -> int:

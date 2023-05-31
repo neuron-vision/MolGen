@@ -2,7 +2,7 @@ import json
 import os
 from timeit import default_timer
 from typing import Dict, List, Union
-
+from pathlib import Path as _P
 from tqdm import tqdm
 
 
@@ -24,7 +24,6 @@ class CharTokenizer():
                     full_path = os.path.join(data_path, path)
                     tokenized_file = self.build_tokenizer(full_path)
                     self.id2token = {**self.id2token, **tokenized_file}
-                    print(self.id2token)
             else:
                 if not quickmode:
                     self.id2token = self.build_tokenizer(data_path)
@@ -39,17 +38,15 @@ class CharTokenizer():
             self.id2token[len_tokens + 3] = '[SEP]'
             self.id2token[len_tokens + 4] = '[UNK]'
             self.id2token[len_tokens + 5] = '[CLS]'
-            print(self.id2token)
             
             print('Saving tokenizer')
             if tokenizer_path:
+                os.makedirs(_P(tokenizer_path).parent, exist_ok=True)
                 with open(tokenizer_path, 'w') as f:
                     json.dump(self.id2token, f)
 
         self.token2id: Dict[str, int] = {v: k for k, v in self.id2token.items()}
-       
-        print(self.id2token)
-        print(self.token2id)
+    
         
     @property
     def vocab_size(self):
