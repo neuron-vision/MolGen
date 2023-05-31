@@ -1,5 +1,6 @@
 import json
 import os
+from timeit import default_timer
 from typing import Dict, List, Union
 
 from tqdm import tqdm
@@ -7,7 +8,10 @@ from tqdm import tqdm
 
 class CharTokenizer():
     
-    def __init__(self, tokenizer_path: str='./tokenizers/', data_path: str='./data/') -> None:
+    def __init__(self, 
+                 tokenizer_path: str='./tokenizers/', 
+                 data_path: str='./data/',
+                 quickmode:bool =True) -> None:
 
         if tokenizer_path and os.path.exists(tokenizer_path):
             with open(tokenizer_path, 'r') as f:
@@ -22,7 +26,10 @@ class CharTokenizer():
                     self.id2token = {**self.id2token, **tokenized_file}
                     print(self.id2token)
             else:
-                self.id2token = self.build_tokenizer(data_path)
+                if not quickmode:
+                    self.id2token = self.build_tokenizer(data_path)
+                else:
+                    self.id2token = self.build_tokenizer_short(data_path)
                 
             len_tokens = len(self.id2token)
 
@@ -97,6 +104,24 @@ class CharTokenizer():
         return self.token2id['[CLS]']
 
 
+    def build_tokenizer_short(self, data_path:str) -> Dict[int, str]:
+        # Quick mode for sanity.
+        self.molecules = []
+        start_time = default_timer()
+        MAX_MOL = 1000000
+        with open(data_path, 'r') as f:
+            for i in tqdm(range(MAX_MOL)):
+                line = f.readline().strip()
+                self.molecules.append(line)
+
+        id2token = {}
+        for i, token in enumerate(self.molecules):
+            id2token[i] = token
+        runtime = default_timer() - start_time
+        print(f"Finished parsing {len(self.molecules)}, in runtime {runtime} AVG {len(self.molecules)/runtime}")
+        return id2token
+        
+
     def build_tokenizer(self, data_path:str) -> Dict[int, str]:
 
         with open(data_path, 'r') as f:
@@ -105,9 +130,8 @@ class CharTokenizer():
 
         print('Building tokenzier')
 
-        tokens = set()
         id2token = {}
-        for i, token in enumerate(tokens):
+        for i, token in enumerate(self.molecules):
             id2token[i] = token
         
         return id2token

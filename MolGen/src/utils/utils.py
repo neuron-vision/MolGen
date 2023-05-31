@@ -105,13 +105,14 @@ def parse_arguments():
     parser.add_argument('--preditor_resid_dropout_rate', type=float, default=0.1,
                         help='residual layers dropout rate')
 
-    parser.add_argument('--dataset_path', type=str, default='./data/gdb/gdb13/gdb13.smi',
+    parser.add_argument('--dataset_path', type=str, default='./data/gdb/gdb13/13.smi',
                         help='dataset to trian for language modeling')
     parser.add_argument('--tokenizer_path', type=str, default='./data/tokenizers/gdb13ScaffoldCharTokenizer.json',
                         help='path to tokenizer')
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--model', default=ModelOpt.GPT, type=lambda opt: ModelOpt[opt], choices=list(ModelOpt))
     parser.add_argument('--use_scaffold', default=False, type=bool, help='whether to use scaffold')
+    parser.add_argument('--quickmode', default=True, type=bool, help='easy local run for sanity.')
     
     return parser.parse_args()
 

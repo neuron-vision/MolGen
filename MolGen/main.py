@@ -83,9 +83,12 @@ def main():
 
     print(parser.device)
     
-    max_smiles_len = get_max_smiles_len(parser.dataset_path) + 50
-    #max_smiles_len = 256
-    tokenizer = CharTokenizer(parser.tokenizer_path, parser.dataset_path)
+    if not parser.quickmode:
+        max_smiles_len = get_max_smiles_len(parser.dataset_path) + 50
+    else:
+        max_smiles_len = 256
+
+    tokenizer = CharTokenizer(parser.tokenizer_path, parser.dataset_path, parser.quickmode)
 
     dataset = get_dataset(data_path=parser.dataset_path,
                           tokenizer=tokenizer,
